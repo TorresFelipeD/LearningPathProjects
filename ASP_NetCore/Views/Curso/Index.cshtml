@@ -1,0 +1,21 @@
+﻿@model Curso;
+
+@{
+    ViewData["Title"] = "Información Curso";
+}
+
+<div>
+    <h1>@ViewData["Title"]</h1>
+    <div>
+        <strong>Vista Normal</strong>
+        <div>
+            <p>Id: @Model.Id</p>
+            <p>Nombre: @Model.Nombre</p>
+            <p>Escuela ID: @Model.EscuelaId</p>
+        </div>
+    </div>
+    <div>
+        <strong>Vista parcial</strong>
+        <partial name="_ObjetoEscuelaSimple" /> 
+    </div>
+</div>

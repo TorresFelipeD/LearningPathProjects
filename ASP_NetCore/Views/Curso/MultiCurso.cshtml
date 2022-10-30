@@ -1,0 +1,34 @@
+﻿@model List<Curso>;
+
+@{
+    ViewData["Title"] = "Información Curso";
+}
+
+<div>
+    <h1>@ViewData["Title"]</h1>
+    <hr>
+    <table class="table table-dark table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Id</th>
+                <th scope="col">Escuela Id</th>
+                <th scope="col">Tipo Jornada</th>
+                <th scope="col">Dirección</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var objCurso in Model)
+            {
+                <tr>
+                    <td>@objCurso.Nombre</td>
+                    <td>@objCurso.Id</td>
+                    <td>@objCurso.EscuelaId</td>
+                    <td>@objCurso.TipoJornada</td>
+                    <td>@objCurso.Address</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+</div>
