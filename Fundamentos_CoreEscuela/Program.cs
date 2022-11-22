@@ -19,6 +19,7 @@ namespace CoreEscuela
             AppDomain.CurrentDomain.ProcessExit += AccionEvento;
             AppDomain.CurrentDomain.ProcessExit -= AccionEvento;
 
+
             Printer.DrawLine();
 
             EscuelaEngine engine = new EscuelaEngine();
