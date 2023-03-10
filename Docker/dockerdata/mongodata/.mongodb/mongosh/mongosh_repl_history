@@ -1,0 +1,6 @@
+db.users.find()
+use dbDocker
+show dbs
+db.users.find()
+db.users.insertOne({"nombre":"Diego Chaparro"})
+use dbDocker
