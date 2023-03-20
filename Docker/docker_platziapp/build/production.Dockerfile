@@ -1,4 +1,4 @@
-FROM node:12 as builder
+FROM node:18 as builder
 
 COPY ["package.json", "package-lock.json", "/usr/src/"]
 
@@ -14,7 +14,7 @@ RUN npm run test
 
 
 # Productive image
-FROM node:12
+FROM node:18
 
 COPY ["package.json", "package-lock.json", "/usr/src/"]
 

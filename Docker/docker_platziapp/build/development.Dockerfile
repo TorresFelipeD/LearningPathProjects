@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:18
 
 COPY ["package.json", "package-lock.json", "/usr/src/"]
 
@@ -10,4 +10,4 @@ COPY [".", "/usr/src/"]
 
 EXPOSE 3000
 
-CMD ["npx", "nodemon", "index.js"]
+CMD ["npx", "nodemon", "-L","index.js"]
