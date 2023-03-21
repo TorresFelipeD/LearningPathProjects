@@ -1,10 +1,138 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse,JSONResponse
 
 app = FastAPI()
 app.title = "Mi Aplicación con FastAPI"
 app.description = "Una API solo por diversión"
 app.version = "0.0.1"
 
+movies = [{
+  "id": 1,
+  "title": "Shogun's Ninja (Ninja bugeicho momochi sandayu)",
+  "overview": "tincidunt ante vel ipsum praesent blandit lacinia erat vestibulum sed",
+  "year": 1992,
+  "rating": 2.2,
+  "category": "Action"
+}, {
+  "id": 2,
+  "title": "Beijing Bicycle (Shiqi sui de dan che)",
+  "overview": "arcu adipiscing molestie hendrerit at vulputate vitae nisl aenean lectus",
+  "year": 1992,
+  "rating": 4.6,
+  "category": "Drama"
+}, {
+  "id": 3,
+  "title": "Evil Roy Slade",
+  "overview": "dapibus dolor vel est donec odio justo sollicitudin ut suscipit a feugiat et",
+  "year": 2007,
+  "rating": 5.8,
+  "category": "Western"
+}, {
+  "id": 4,
+  "title": "Garfield's Pet Force",
+  "overview": "diam id ornare imperdiet sapien urna pretium nisl ut volutpat sapien",
+  "year": 2009,
+  "rating": 4.8,
+  "category": "Animation"
+}, {
+  "id": 5,
+  "title": "Profession of Arms, The (Il mestiere delle armi)",
+  "overview": "dictumst maecenas ut massa quis augue luctus tincidunt nulla mollis molestie lorem quisque ut erat",
+  "year": 2000,
+  "rating": 3.5,
+  "category": "Adventure"
+}, {
+  "id": 6,
+  "title": "Space Odyssey: Voyage to the Planets",
+  "overview": "mauris enim leo rhoncus sed vestibulum sit amet cursus id turpis integer aliquet massa id",
+  "year": 2003,
+  "rating": 1.7,
+  "category": "Sci-Fi"
+}, {
+  "id": 7,
+  "title": "Harold & Kumar Escape from Guantanamo Bay",
+  "overview": "sit amet justo morbi ut odio cras mi pede malesuada in imperdiet et commodo vulputate justo in blandit ultrices enim",
+  "year": 1992,
+  "rating": 3.6,
+  "category": "Adventure"
+}, {
+  "id": 8,
+  "title": "Any Wednesday (Bachelor Girl Apartment)",
+  "overview": "lacinia erat vestibulum sed magna at nunc commodo placerat praesent",
+  "year": 2001,
+  "rating": 6.5,
+  "category": "Comedy"
+}, {
+  "id": 9,
+  "title": "360",
+  "overview": "bibendum felis sed interdum venenatis turpis enim blandit mi in porttitor pede justo eu massa",
+  "year": 2001,
+  "rating": 8.9,
+  "category": "Drama"
+}, {
+  "id": 10,
+  "title": "Sukiyaki Western Django",
+  "overview": "non pretium quis lectus suspendisse potenti in eleifend quam a odio in hac habitasse platea dictumst maecenas ut",
+  "year": 1990,
+  "rating": 1.4,
+  "category": "Action"
+}, {
+  "id": 11,
+  "title": "Breaking and Entering",
+  "overview": "in consequat ut nulla sed accumsan felis ut at dolor quis odio consequat varius integer ac leo",
+  "year": 1990,
+  "rating": 6.0,
+  "category": "Comedy"
+}, {
+  "id": 12,
+  "title": "Dead Like Me: Life After Death",
+  "overview": "mattis egestas metus aenean fermentum donec ut mauris eget massa tempor convallis nulla neque libero convallis eget eleifend luctus ultricies",
+  "year": 1989,
+  "rating": 1.6,
+  "category": "Fantasy"
+}, {
+  "id": 13,
+  "title": "Off Limits",
+  "overview": "ligula vehicula consequat morbi a ipsum integer a nibh in quis justo maecenas rhoncus aliquam lacus morbi quis tortor id",
+  "year": 2009,
+  "rating": 3.5,
+  "category": "Action"
+}, {
+  "id": 14,
+  "title": "Dylan Moran: Monster",
+  "overview": "magna vulputate luctus cum sociis natoque penatibus et magnis dis parturient montes nascetur ridiculus mus vivamus vestibulum sagittis sapien",
+  "year": 2003,
+  "rating": 9.6,
+  "category": "Comedy"
+}, {
+  "id": 15,
+  "title": "Blue Gold: World Water Wars",
+  "overview": "aliquam lacus morbi quis tortor id nulla ultrices aliquet maecenas leo odio",
+  "year": 2005,
+  "rating": 8.0,
+  "category": "Documentary"
+}]
+
 @app.get('/', tags=['Home'])
 def message():
-    return "Hello World!"
+    return HTMLResponse("<h1>Hello World!</h1>")
+
+@app.get('/movies', tags=['Movies'])
+def get_movies():
+    return movies
+
+@app.get('/movies/{id}', tags=['Movies'])
+def get_movie(id: int):
+    for item in movies:
+        if item["id"] == id:
+            return item
+    raise HTTPException(status_code=404, detail="Movie not found")
+
+@app.get('/movies/', tags = ['Movies'])
+def get_movies_by_category(category: str=None, year:int=None):
+    filtered_list_movies = list(filter(lambda x: category.lower() == x["category"].lower() or year == x["year"], movies))
+    list_movies = list(filtered_list_movies)
+    if not list_movies:
+        raise HTTPException(status_code=404, detail="Movie not found!")
+
+    return JSONResponse(content=list_movies)
