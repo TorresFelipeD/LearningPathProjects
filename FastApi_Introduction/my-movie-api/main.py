@@ -51,3 +51,23 @@ def create_movie(request: BodyRequest):
     movie['id'] = max_id + 1
     movies.append(movie)
     return movies
+
+@app.put('/movies/{id}', tags = ['Movies'])
+def update_movie(id: int, request: BodyRequest):
+    movie = request.dict()
+    for item in movies:
+        if item['id'] == id:
+            item['title'] = movie['title'] 
+            item['overview'] = movie['overview']
+            item['year'] = movie['year'] 
+            item['rating'] = movie['rating']
+            item['category'] = movie['category']
+            return movies
+        
+@app.delete('/movies/{id}', tags = ['Movies'])
+def delete_movie(id: int):
+    for item in movies:
+        if item['id'] == id:
+            movies.remove(item)
+            return movies
+        
