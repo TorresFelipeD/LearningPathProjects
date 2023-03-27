@@ -1,20 +1,13 @@
 import json
-from fastapi import FastAPI, HTTPException, Body, Request
+from fastapi import FastAPI, HTTPException, Body, Request, Path, Query
 from fastapi.responses import HTMLResponse,JSONResponse
-from pydantic import BaseModel
+from typing import List
+from movie import Movie
 
 app = FastAPI()
 app.title = "Mi Aplicación con FastAPI"
 app.description = "Una API solo por diversión"
 app.version = "0.0.1"
-
-class BodyRequest(BaseModel):
-    id: int
-    title: str
-    overview: str
-    year: int
-    rating: float
-    category: str
 
 with open('data/movies.json') as data:
   movies = json.load(data)
@@ -23,29 +16,32 @@ with open('data/movies.json') as data:
 def message():
     return HTMLResponse("<h1>Hello World!</h1>")
 
-@app.get('/movies', tags=['Movies'])
+@app.get('/movies', tags=['Movies'], response_model=List[Movie])
 def get_movies():
-    return movies
+    return JSONResponse(content=movies)
 
-@app.get('/movies/{id}', tags=['Movies'])
-def get_movie(id: int):
+@app.get('/movies/{id}', tags=['Movies'], response_model=List[Movie])
+def get_movie(id: int = Path(ge=1, le=2000)):
     for item in movies:
         if item["id"] == id:
-            return item
+            return JSONResponse(content=item)
     raise HTTPException(status_code=404, detail="Movie not found")
 
-@app.get('/movies/', tags = ['Movies'])
-def get_movies_by_category(category: str=None, year:int=None):
-    category = category if category is None or len(category) == 0 else category.lower()
-    filtered_list_movies = list(filter(lambda x: category == x["category"].lower() or year == x["year"], movies))
-    list_movies = list(filtered_list_movies)
-    if not list_movies:
-        raise HTTPException(status_code=404, detail="Movie not found!")
+@app.get('/movies/', tags = ['Movies'], response_model=List[Movie])
+def get_movies_by_category(category: str= Query(default=None,min_length=3,max_length=100), year:int=Query(default=None, ge=1900,le=2100)):
+    if category is None and year is None:
+        return movies
+    else:
+        category = category if category is None or len(category) == 0 else category.lower()
+        filtered_list_movies = list(filter(lambda x: category == x["category"].lower() or year == x["year"], movies))
+        list_movies = list(filtered_list_movies)
+        if not list_movies:
+            raise HTTPException(status_code=404, detail="Movie not found!")
 
-    return JSONResponse(content=list_movies)
+        return JSONResponse(content=list_movies)
 
 @app.post('/movies/', tags = ['Movies'])
-def create_movie(request: BodyRequest):
+def create_movie(request: Movie):
     movie = request.dict()
     max_id = max([movies_['id'] for movies_ in movies]) 
     movie['id'] = max_id + 1
@@ -53,15 +49,12 @@ def create_movie(request: BodyRequest):
     return movies
 
 @app.put('/movies/{id}', tags = ['Movies'])
-def update_movie(id: int, request: BodyRequest):
+def update_movie(id: int, request: Movie):
     movie = request.dict()
-    for item in movies:
+    for index,item in enumerate(movies):
         if item['id'] == id:
-            item['title'] = movie['title'] 
-            item['overview'] = movie['overview']
-            item['year'] = movie['year'] 
-            item['rating'] = movie['rating']
-            item['category'] = movie['category']
+            movie['id'] = id
+            movies[index].update(movie)
             return movies
         
 @app.delete('/movies/{id}', tags = ['Movies'])
