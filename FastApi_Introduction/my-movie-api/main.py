@@ -1,8 +1,11 @@
 import json
-from fastapi import FastAPI, HTTPException, Body, Request, Path, Query
+from fastapi import FastAPI, HTTPException, Body, Request, Path, Query, Depends
 from fastapi.responses import HTMLResponse,JSONResponse
+from fastapi.security import HTTPBearer 
 from typing import List
 from movie import Movie
+from jwt_manager import create_token, validate_token, JWTBearer
+from user import User
 
 app = FastAPI()
 app.title = "Mi Aplicación con FastAPI"
@@ -16,7 +19,15 @@ with open('data/movies.json') as data:
 def message():
     return HTMLResponse("<h1>Hello World!</h1>")
 
-@app.get('/movies', tags=['Movies'], response_model=List[Movie])
+@app.post('/login', tags=['Auth'])
+def login(user: User):
+    if user.email == "admin" and user.password == "admin":
+        token: str = create_token(user.dict())
+        return JSONResponse(status_code=200,content=token)
+    else:
+        raise HTTPException(status_code=401, detail="Invalid Credentials")
+
+@app.get('/movies', tags=['Movies'], response_model=List[Movie], dependencies=[Depends(JWTBearer())])
 def get_movies():
     return JSONResponse(content=movies)
 
