@@ -1,0 +1,106 @@
+Ypur computer's hard drive is almost full. In order to make some space, you need to compile some file statics. You want to know how many bytes of memory each file type is consuming. Each file has a name, and the part of the name after the last dot is called the file extension, which identifies what type of the file it is. We distinguish four broad types of file:
+- music (only extension: mp3, acc, flac)
+- image (only extension: jpg,bmp,gif)
+- movie (only extension: mp4,avi,mkv)
+- other (all other extensions, for example: 7z,txt,zip)
+
+You receive string S, containing a list of all the files on your computer (each file appears on a separate line). Each line contains a file name and the file's size in bytes, separated by a space. For example, string S could look like:
+"my.song.mp3 11b
+greatSong.flac 1000b
+not3.txt 5b
+video.mp4 200b
+game.exe 100b
+mov!e.mkv 10000b"
+
+There are two music files (my.song.mp3 and greatSong.flac, of size 11 and 1000 bytes respectively). There are no images files. We have two movies files (video.mp4 and mov!e.mkv of size 200 and 10000 bytes). There are two files of other types (not3.txt and game.exe of size 5 and 100 bytes). In total there are 1011 bytes of music, 0 bytes of images, 10200 bytes of movies and 105 bytes of other files.
+
+Write a function.
+
+that given string S describing the file son a disk, returns a string containing four rows, describing music, images, movies and other file types respectively. Each row should consist of a file type and the number of bytes consumed by files of that typeon the disk (use format "<<type>> <<size>>b" where <<type>> is the file's type <<size>> is the toal file size of this group).
+
+For instance, given string  S as shown above, your function should return:
+"music 1011b
+images 0b
+movies 10200b
+other 105b"
+
+as described above.
+
+Assume that:
+- string S contains at most 500 lines; there are no empty lines; each line contains exactly one space, separating the file name from its size;
+- each file described in S has a non-empty file name of at most 30 character length; the file name includes a file extension as its final few characters, from the charatcer after the last dot to the end of the file name; th file extension is never empty and it consist only of lower-case English letters (a-z) and digits (0-9); the file name can't consist of an extension alone.
+- the file name consists only of lower-case English letters (a-z), upper-case English letters(A-Z), digits (0-9) and special characters "" without quotes.
+- The size of each file described in S is a positive integer, less than or equal to 1.000.000 bytes
+
+------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+// you can also use other imports, for example:
+// using System.Collections.Generic;
+
+// you can write to stdout for debugging purposes, e.g.
+// Console.WriteLine("this is a debug message");
+
+class Solution {
+    public string solution(string S) {
+            Dictionary<string, long> fileTypes = new Dictionary<string, long>
+        {
+            { "music", 0 },
+            { "images", 0 },
+            { "movies", 0 },
+            { "other", 0 }
+        };
+
+            var newline = new[] { '\n' };
+
+            string[] lines = S.Split(newline, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                string[] parts = line.Trim().Split(' ');
+                if (parts.Length == 2)
+                {
+                    string fileName = parts[0];
+                    long fileSize = long.Parse(parts[1].Trim('b'));
+
+                    //string extension = GetFileExtension(fileName);
+                    string extension = null;
+
+                    int lastDotIndex = fileName.LastIndexOf('.');
+                    if (lastDotIndex >= 0 && lastDotIndex < fileName.Length - 1)
+                    {
+                        extension = fileName.Substring(lastDotIndex + 1);
+                    }
+
+                    if (extension != null)
+                    {
+                        switch (extension)
+                        {
+                            case "mp3":
+                            case "acc":
+                            case "flac":
+                                fileTypes["music"] += fileSize;
+                                break;
+                            case "jpg":
+                            case "bmp":
+                            case "gif":
+                                fileTypes["images"] += fileSize;
+                                break;
+                            case "mp4":
+                            case "avi":
+                            case "mkv":
+                                fileTypes["movies"] += fileSize;
+                                break;
+                            default:
+                                fileTypes["other"] += fileSize;
+                                break;
+                        }
+                    }
+                }
+            }
+
+            return string.Join(newline[0].ToString(), fileTypes.Select(pair => $"{pair.Key} {pair.Value}b"));
+    }
+}
